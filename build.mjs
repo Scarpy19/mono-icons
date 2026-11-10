@@ -168,6 +168,25 @@ const template = `<!doctype html>
   .segmented button:hover { color: var(--text); }
   .segmented button.active { background: #26262c; color: var(--text); }
 
+  .repo-link {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    color: var(--muted);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: color .15s, background .15s, border-color .15s;
+  }
+  .repo-link:hover {
+    color: var(--text);
+    background: var(--panel-hover);
+    border-color: var(--border-hover);
+  }
+  .repo-link svg { width: 17px; height: 17px; }
+
   /* Grid */
   main {
     width: 100%;
@@ -360,6 +379,12 @@ const template = `<!doctype html>
     <button type="button" data-mode="svg" title="Copiar SVG inline">SVG</button>
     <button type="button" data-mode="font" title="Copiar etiqueta de webfont">Webfont</button>
   </div>
+
+  <a class="repo-link" href="https://github.com/Scarpy19/mono-icons" target="_blank" rel="noreferrer" title="Repositorio en GitHub" aria-label="Repositorio en GitHub">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.6-1.3-1.6-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/>
+    </svg>
+  </a>
 </header>
 
 <main>
@@ -373,6 +398,7 @@ const template = `<!doctype html>
 <footer>
   <a href="https://icons.mono.company/" target="_blank" rel="noreferrer">Mono Icons</a>
   <span class="dot">/</span> MIT
+  <span class="dot">/</span> <a href="https://github.com/Scarpy19/mono-icons" target="_blank" rel="noreferrer">este repo</a>
   <span class="dot">/</span> <a href="https://github.com/mono-company/mono-icons" target="_blank" rel="noreferrer">repo original</a>
   <span class="dot">/</span> clic en un icono para copiar
   <span class="dot">/</span> SVG con <code>currentColor</code>

@@ -400,6 +400,7 @@ const template = `<!doctype html>
   <span class="dot">/</span> MIT
   <span class="dot">/</span> <a href="https://github.com/Scarpy19/mono-icons" target="_blank" rel="noreferrer">este repo</a>
   <span class="dot">/</span> <a href="https://github.com/mono-company/mono-icons" target="_blank" rel="noreferrer">repo original</a>
+  <span class="dot">/</span> hecho por IA dirigida por Scarpy19
   <span class="dot">/</span> clic en un icono para copiar
   <span class="dot">/</span> SVG con <code>currentColor</code>
   <span class="dot">/</span> webfont requiere <code>icons.css</code>

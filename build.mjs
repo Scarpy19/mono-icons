@@ -315,6 +315,63 @@ const template = `<!doctype html>
   }
   .tool-btn:hover { background: var(--panel-hover); border-color: var(--border-hover); }
 
+  /* Toggle */
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    pointer-events: none;
+  }
+  .toggle-track {
+    position: relative;
+    width: 30px;
+    height: 16px;
+    background: #26262c;
+    border: 1px solid #33333a;
+    border-radius: 999px;
+    transition: background .18s, border-color .18s;
+  }
+  .toggle-thumb {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 12px;
+    height: 12px;
+    background: #8a8a92;
+    border-radius: 50%;
+    transition: transform .18s, background .18s;
+  }
+  .toggle input:checked + .toggle-track {
+    background: #ededf0;
+    border-color: #ededf0;
+  }
+  .toggle input:checked + .toggle-track .toggle-thumb {
+    transform: translateX(14px);
+    background: #0a0a0b;
+  }
+  .toggle input:focus-visible + .toggle-track {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, .12);
+  }
+  .toggle-label { white-space: nowrap; }
+
+  .color-value {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 78px;
+  }
+
   /* Layout */
   .layout {
     display: flex;
@@ -511,11 +568,13 @@ const template = `<!doctype html>
 
 <main>
   <div class="toolbar">
-    <label class="control">
+    <label class="toggle" title="Activar para elegir un color personalizado">
       <input type="checkbox" id="colorToggle" aria-label="Usar color personalizado">
-      <span>Color</span>
+      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+      <span class="toggle-label">Color personalizado</span>
     </label>
     <input type="color" id="color" value="#ededf0" disabled aria-label="Color de previsualizacion">
+    <span class="color-value" id="colorValue">currentColor</span>
     <div class="control">
       <span>Tamano</span>
       <div class="segmented" id="sizes" role="group" aria-label="Tamano de icono">
@@ -603,6 +662,7 @@ const template = `<!doctype html>
   // Color / size controls
   var colorInput = document.getElementById("color");
   var colorToggle = document.getElementById("colorToggle");
+  var colorValue = document.getElementById("colorValue");
   var sizeButtons = Array.prototype.slice.call(document.querySelectorAll("#sizes button"));
   function setColor(value) {
     document.documentElement.style.setProperty("--icon-color", value);
@@ -617,9 +677,11 @@ const template = `<!doctype html>
     if (colorToggle && colorToggle.checked) {
       if (colorInput) colorInput.disabled = false;
       if (colorInput) setColor(colorInput.value);
+      if (colorValue) colorValue.textContent = colorInput ? colorInput.value : "";
     } else {
       if (colorInput) colorInput.disabled = true;
       setColor("currentColor");
+      if (colorValue) colorValue.textContent = "currentColor";
     }
   }
   if (colorToggle) {
@@ -627,7 +689,10 @@ const template = `<!doctype html>
   }
   if (colorInput) {
     colorInput.addEventListener("input", function () {
-      if (colorToggle && colorToggle.checked) setColor(colorInput.value);
+      if (colorToggle && colorToggle.checked) {
+        setColor(colorInput.value);
+        if (colorValue) colorValue.textContent = colorInput.value;
+      }
     });
   }
   applyColor();

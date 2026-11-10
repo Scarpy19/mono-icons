@@ -35,6 +35,8 @@ const template = `<!doctype html>
     --text: #ededf0;
     --muted: #77777f;
     --muted-hover: #b6b6bd;
+    --icon-color: #ededf0;
+    --icon-size: 26px;
   }
 
   * { box-sizing: border-box; }
@@ -229,7 +231,7 @@ const template = `<!doctype html>
   .card:focus-visible { outline: 2px solid #5b5b66; outline-offset: 2px; }
   .card[hidden] { display: none; }
 
-  .card svg { width: 26px; height: 26px; flex: none; }
+  .card svg { width: var(--icon-size); height: var(--icon-size); flex: none; color: var(--icon-color); }
   .card .glyph { display: flex; }
 
   .card .copy {
@@ -273,6 +275,122 @@ const template = `<!doctype html>
     40% { transform: scale(.9); }
     100% { transform: scale(1); }
   }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    margin-bottom: 18px;
+  }
+  .toolbar .control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .toolbar .control span { white-space: nowrap; }
+  .toolbar input[type="color"] {
+    width: 30px;
+    height: 28px;
+    padding: 2px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+  }
+  .tool-btn {
+    appearance: none;
+    padding: 7px 12px;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .tool-btn:hover { background: var(--panel-hover); border-color: var(--border-hover); }
+
+  /* Layout */
+  .layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+  .content { flex: 1 1 auto; min-width: 0; }
+
+  /* Panel */
+  .panel {
+    width: 320px;
+    flex: 0 0 320px;
+    position: sticky;
+    top: 84px;
+    align-self: flex-start;
+    max-height: calc(100vh - 100px);
+    overflow: auto;
+    padding: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .panel-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .panel-preview {
+    display: grid;
+    place-items: center;
+    min-height: 88px;
+    margin-bottom: 12px;
+    background: #0c0c0e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .panel-preview svg { width: 48px; height: 48px; color: var(--icon-color); }
+  .panel-code {
+    margin: 0 0 12px;
+    padding: 10px;
+    max-height: 220px;
+    overflow: auto;
+    background: #0c0c0e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #c9c9d0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .panel-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .panel-actions button {
+    appearance: none;
+    flex: 1 1 0;
+    min-width: 90px;
+    padding: 7px 10px;
+    background: #26262c;
+    color: var(--text);
+    border: 1px solid #33333a;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .panel-actions button:hover { background: #303038; border-color: #44444d; }
 
   /* Empty state */
   .empty {
@@ -345,10 +463,14 @@ const template = `<!doctype html>
     header { flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
     .search { order: 3; flex-basis: 100%; max-width: none; margin-left: 0; }
     .segmented { margin-left: auto; }
+    .repo-link { margin-left: 0; }
     main { padding: 16px; }
+    .layout { flex-direction: column; gap: 16px; }
+    .panel { width: 100%; flex: 1 1 auto; position: static; max-height: none; }
     .grid { grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); gap: 8px; }
     .card { gap: 8px; }
-    .card svg { width: 23px; height: 23px; }
+    .card svg { width: min(var(--icon-size), 23px); height: min(var(--icon-size), 23px); }
+    .toolbar { gap: 10px 12px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -388,10 +510,42 @@ const template = `<!doctype html>
 </header>
 
 <main>
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="empty" hidden>
-    <p>No se encontraron iconos.</p>
-    <button type="button" id="clear">Limpiar busqueda</button>
+  <div class="toolbar">
+    <label class="control">
+      <input type="checkbox" id="colorToggle" aria-label="Usar color personalizado">
+      <span>Color</span>
+    </label>
+    <input type="color" id="color" value="#ededf0" disabled aria-label="Color de previsualizacion">
+    <div class="control">
+      <span>Tamano</span>
+      <div class="segmented" id="sizes" role="group" aria-label="Tamano de icono">
+        <button type="button" data-size="16">16</button>
+        <button type="button" data-size="24" class="active">24</button>
+        <button type="button" data-size="32">32</button>
+      </div>
+    </div>
+    <button type="button" class="tool-btn" id="copyAll">Copiar todos (JSON)</button>
+  </div>
+
+  <div class="layout">
+    <div class="content">
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" hidden>
+        <p>No se encontraron iconos.</p>
+        <button type="button" id="clear">Limpiar busqueda</button>
+      </div>
+    </div>
+
+    <aside class="panel" id="panel" aria-label="Codigo del icono seleccionado">
+      <span class="panel-name" id="panelName">Selecciona un icono</span>
+      <div class="panel-preview" id="panelPreview"></div>
+      <pre class="panel-code"><code id="panelCode">// Haz clic en un icono</code></pre>
+      <div class="panel-actions">
+        <button type="button" id="panelCopySvg">Copiar SVG</button>
+        <button type="button" id="panelCopyFont">Copiar webfont</button>
+        <button type="button" id="panelDownload">Descargar SVG</button>
+      </div>
+    </aside>
   </div>
 </main>
 
@@ -425,7 +579,7 @@ const template = `<!doctype html>
     if (saved === "svg" || saved === "font") mode = saved;
   } catch (e) {}
 
-  var modeButtons = Array.prototype.slice.call(document.querySelectorAll(".segmented button"));
+  var modeButtons = Array.prototype.slice.call(document.querySelectorAll(".segmented button[data-mode]"));
 
   function setMode(next) {
     mode = next;
@@ -446,14 +600,58 @@ const template = `<!doctype html>
   });
   setMode(mode);
 
+  // Color / size controls
+  var colorInput = document.getElementById("color");
+  var colorToggle = document.getElementById("colorToggle");
+  var sizeButtons = Array.prototype.slice.call(document.querySelectorAll("#sizes button"));
+  function setColor(value) {
+    document.documentElement.style.setProperty("--icon-color", value);
+  }
+  function setSize(value) {
+    document.documentElement.style.setProperty("--icon-size", value + "px");
+    sizeButtons.forEach(function (b) {
+      b.classList.toggle("active", b.dataset.size === String(value));
+    });
+  }
+  function applyColor() {
+    if (colorToggle && colorToggle.checked) {
+      if (colorInput) colorInput.disabled = false;
+      if (colorInput) setColor(colorInput.value);
+    } else {
+      if (colorInput) colorInput.disabled = true;
+      setColor("currentColor");
+    }
+  }
+  if (colorToggle) {
+    colorToggle.addEventListener("change", applyColor);
+  }
+  if (colorInput) {
+    colorInput.addEventListener("input", function () {
+      if (colorToggle && colorToggle.checked) setColor(colorInput.value);
+    });
+  }
+  applyColor();
+  sizeButtons.forEach(function (b) {
+    b.addEventListener("click", function () { setSize(b.dataset.size); });
+  });
+  setSize(24);
+
+  // Build cards
   var fragment = document.createDocumentFragment();
-  ICONS.forEach(function (icon) {
+  ICONS.forEach(function (icon, index) {
     var card = document.createElement("button");
     card.type = "button";
     card.className = "card";
     card.dataset.name = icon.name;
+    card.dataset.index = String(index);
     card.title = "Copiar " + icon.name;
     card.setAttribute("aria-label", "Copiar " + icon.name);
+    card.tabIndex = index === 0 ? 0 : -1;
+    card.addEventListener("focus", function () {
+      var idx = Number(card.dataset.index);
+      if (!isNaN(idx)) focusedIndex = idx;
+      selectIcon(card.dataset.name);
+    });
     card.innerHTML =
       '<span class="glyph">' + icon.svg + "</span>" +
       '<span class="name">' + icon.name + "</span>" +
@@ -467,21 +665,21 @@ const template = `<!doctype html>
   });
   grid.appendChild(fragment);
 
+  var cards = Array.prototype.slice.call(grid.querySelectorAll(".card"));
+  var focusedIndex = 0;
+
   function normalize(value) {
     return value.toLowerCase().replace(/[\\s_-]+/g, "");
   }
 
   function applyFilter() {
     var query = normalize(search.value);
-    var cards = grid.children;
     var visible = 0;
-
     for (var i = 0; i < cards.length; i++) {
       var match = !query || normalize(cards[i].dataset.name).indexOf(query) !== -1;
       cards[i].hidden = !match;
       if (match) visible++;
     }
-
     count.textContent = query ? visible + " de " + ICONS.length : ICONS.length + " iconos";
     empty.hidden = visible !== 0;
   }
@@ -525,6 +723,139 @@ const template = `<!doctype html>
     }, 1800);
   }
 
+  function findIcon(name) {
+    for (var i = 0; i < ICONS.length; i++) {
+      if (ICONS[i].name === name) return ICONS[i];
+    }
+    return null;
+  }
+
+  // Panel
+  var panelName = document.getElementById("panelName");
+  var panelPreview = document.getElementById("panelPreview");
+  var panelCode = document.getElementById("panelCode");
+  var panelCopySvg = document.getElementById("panelCopySvg");
+  var panelCopyFont = document.getElementById("panelCopyFont");
+  var panelDownload = document.getElementById("panelDownload");
+  var selectedName = null;
+
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function selectIcon(name) {
+    var icon = findIcon(name);
+    if (!icon) return;
+    selectedName = name;
+    panelName.textContent = name;
+    panelPreview.innerHTML = icon.svg;
+    panelCode.innerHTML = escapeHtml(icon.svg);
+    // Update roving tabindex focus without moving DOM focus
+    try { history.replaceState(null, "", "#" + name); } catch (e) {}
+  }
+
+  function downloadSvg(icon) {
+    var blob = new Blob([icon.svg], { type: "image/svg+xml" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = icon.name + ".svg";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  if (panelCopySvg) {
+    panelCopySvg.addEventListener("click", function () {
+      var icon = findIcon(selectedName);
+      if (!icon) return;
+      copyText(icon.svg).then(function (ok) {
+        if (ok) showToast("SVG copiado / " + icon.name);
+        else showToast("No se pudo copiar");
+      });
+    });
+  }
+  if (panelCopyFont) {
+    panelCopyFont.addEventListener("click", function () {
+      var icon = findIcon(selectedName);
+      if (!icon) return;
+      copyText('<i class="mi-' + icon.name + '"></i>').then(function (ok) {
+        if (ok) showToast("Webfont copiado / mi-" + icon.name);
+        else showToast("No se pudo copiar");
+      });
+    });
+  }
+  if (panelDownload) {
+    panelDownload.addEventListener("click", function () {
+      var icon = findIcon(selectedName);
+      if (!icon) return;
+      downloadSvg(icon);
+      showToast("SVG descargado / " + icon.name);
+    });
+  }
+
+  // Copy all as JSON
+  var copyAllBtn = document.getElementById("copyAll");
+  if (copyAllBtn) {
+    copyAllBtn.addEventListener("click", function () {
+      copyText(JSON.stringify(ICONS)).then(function (ok) {
+        showToast(ok ? "JSON copiado (" + ICONS.length + " iconos)" : "No se pudo copiar");
+      });
+    });
+  }
+
+  function columnsCount() {
+    var style = window.getComputedStyle(grid);
+    var cols = style.gridTemplateColumns;
+    if (!cols || cols === "none") return 1;
+    return cols.split(" ").filter(Boolean).length || 1;
+  }
+
+  function focusCard(index) {
+    if (index < 0 || index >= cards.length) return;
+    var card = cards[index];
+    if (card.hidden) return;
+    // skip hidden
+    cards[focusedIndex].tabIndex = -1;
+    focusedIndex = index;
+    card.tabIndex = 0;
+    card.focus();
+    selectIcon(card.dataset.name);
+    try { card.scrollIntoView({ block: "nearest" }); } catch (e) {}
+  }
+
+  function nextVisible(from, delta) {
+    var cols = columnsCount();
+    var step = delta;
+    if (delta === -1 || delta === 1) step = delta;
+    else if (delta === -cols || delta === cols) step = delta;
+    var i = from + step;
+    // ensure not hidden
+    while (i >= 0 && i < cards.length && cards[i].hidden) {
+      i += (step > 0 ? 1 : -1);
+    }
+    if (i < 0 || i >= cards.length || cards[i].hidden) return from;
+    return i;
+  }
+
+  grid.addEventListener("keydown", function (event) {
+    var cols = columnsCount();
+    var key = event.key;
+    var ni = focusedIndex;
+    if (key === "ArrowRight") ni = nextVisible(focusedIndex, 1);
+    else if (key === "ArrowLeft") ni = nextVisible(focusedIndex, -1);
+    else if (key === "ArrowDown") ni = nextVisible(focusedIndex, cols);
+    else if (key === "ArrowUp") ni = nextVisible(focusedIndex, -cols);
+    else if (key === "Home") ni = 0;
+    else if (key === "End") ni = cards.length - 1;
+    else return;
+    if (ni !== focusedIndex) {
+      event.preventDefault();
+      focusCard(ni);
+    }
+  });
+
   grid.addEventListener("click", function (event) {
     var card = event.target.closest(".card");
     if (!card) return;
@@ -537,6 +868,16 @@ const template = `<!doctype html>
       }
     }
     if (!icon) return;
+
+    // update focus tracking
+    var idx = Number(card.dataset.index);
+    if (!isNaN(idx)) {
+      cards[focusedIndex].tabIndex = -1;
+      focusedIndex = idx;
+      card.tabIndex = 0;
+    }
+
+    selectIcon(icon.name);
 
     var text = mode === "svg" ? icon.svg : '<i class="mi-' + icon.name + '"></i>';
 
@@ -573,7 +914,25 @@ const template = `<!doctype html>
     }
   });
 
+  // Hash link on load
+  function openFromHash() {
+    var name = (location.hash || "").replace(/^#/, "");
+    if (!name) return;
+    var idx = -1;
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].dataset.name === name) { idx = i; break; }
+    }
+    if (idx >= 0) {
+      focusCard(idx);
+      try { cards[idx].scrollIntoView({ block: "center" }); } catch (e) {}
+    }
+  }
+
   applyFilter();
+  openFromHash();
+  if (!location.hash) {
+    selectIcon(ICONS.length ? ICONS[0].name : null);
+  }
 })();
 </script>
 </body>

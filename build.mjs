@@ -373,6 +373,7 @@ const template = `<!doctype html>
 <footer>
   <a href="https://icons.mono.company/" target="_blank" rel="noreferrer">Mono Icons</a>
   <span class="dot">/</span> MIT
+  <span class="dot">/</span> <a href="https://github.com/mono-company/mono-icons" target="_blank" rel="noreferrer">repo original</a>
   <span class="dot">/</span> clic en un icono para copiar
   <span class="dot">/</span> SVG con <code>currentColor</code>
   <span class="dot">/</span> webfont requiere <code>icons.css</code>

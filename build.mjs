@@ -281,6 +281,7 @@ const template = `<!doctype html>
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     gap: 12px 16px;
     margin-bottom: 18px;
   }
@@ -567,27 +568,27 @@ const template = `<!doctype html>
 </header>
 
 <main>
-  <div class="toolbar">
-    <label class="toggle" title="Activar para elegir un color personalizado">
-      <input type="checkbox" id="colorToggle" aria-label="Usar color personalizado">
-      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-      <span class="toggle-label">Color personalizado</span>
-    </label>
-    <input type="color" id="color" value="#ededf0" disabled aria-label="Color de previsualizacion">
-    <span class="color-value" id="colorValue">currentColor</span>
-    <div class="control">
-      <span>Tamano</span>
-      <div class="segmented" id="sizes" role="group" aria-label="Tamano de icono">
-        <button type="button" data-size="16">16</button>
-        <button type="button" data-size="24" class="active">24</button>
-        <button type="button" data-size="32">32</button>
-      </div>
-    </div>
-    <button type="button" class="tool-btn" id="copyAll">Copiar todos (JSON)</button>
-  </div>
-
   <div class="layout">
     <div class="content">
+      <div class="toolbar">
+        <label class="toggle" title="Activar para elegir un color personalizado">
+          <input type="checkbox" id="colorToggle" aria-label="Usar color personalizado">
+          <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Color personalizado</span>
+        </label>
+        <input type="color" id="color" value="#ededf0" disabled aria-label="Color de previsualizacion">
+        <span class="color-value" id="colorValue">currentColor</span>
+        <div class="control">
+          <span>Tamano</span>
+          <div class="segmented" id="sizes" role="group" aria-label="Tamano de icono">
+            <button type="button" data-size="16">16</button>
+            <button type="button" data-size="24" class="active">24</button>
+            <button type="button" data-size="32">32</button>
+          </div>
+        </div>
+        <button type="button" class="tool-btn" id="copyAll">Copiar todos (JSON)</button>
+      </div>
+
       <div class="grid" id="grid"></div>
       <div class="empty" id="empty" hidden>
         <p>No se encontraron iconos.</p>
